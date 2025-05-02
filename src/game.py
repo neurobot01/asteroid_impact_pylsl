@@ -1,4 +1,4 @@
-# Asteroid Impact (c) Media Neuroscience Lab, Rene Weber
+﻿# Asteroid Impact (c) Media Neuroscience Lab, Rene Weber
 # Authored by Nick Winters
 #
 # Asteroid Impact is licensed under a
@@ -19,15 +19,25 @@ import json
 import os
 import random  # step shuffling
 from os import path
+import sys
 
 import pygame
 from pygame.locals import *
 
-# >>> 6 / 7
-# 1
-# >>> from __future__ import division
-# >>> 6 / 7
-# 1.2857142857142858
+script_dir = os.path.dirname(os.path.abspath(__file__))
+aurora_api_path = os.path.join(script_dir,"aurora_api")
+sys.path.append(aurora_api_path)
+
+from aurora import Aurora, aurora_connection, AuroraRequestError
+from models import AuroraSettings
+
+try:
+    # ---- NEW ----
+    from pylsl import StreamInfo, StreamOutlet
+except ImportError as e:
+    print(e)
+    print('install pylsl with `pip install pylsl`')
+    StreamInfo = StreamOutlet = None      # keep game runnable even without pylsl
 
 try:
     import serial
@@ -69,7 +79,13 @@ ALL_TRIGGERS = [
     'game_shield_activate',  # in either game mode, when the player activates a shield
     'game_slow_activate',  # in either game mode, when the player activates the slowdown powerup
     'adaptive_difficulty_increase',  # adaptive, when collecting the last diamond increases to the next level template
-    'adaptive_difficulty_decrease'  # adaptive, when dying goes back to an earlier level template
+    'adaptive_difficulty_decrease',  # adaptive, when dying goes back to an earlier level template
+    'dtrt_go_onset',
+    'dtrt_nogo_onset',
+    'dtrt_go_hit',
+    'dtrt_go_miss',
+    'dtrt_nogo_fa',
+    'dtrt_nogo_cr'
 ]
 
 # command-line arguments:
@@ -188,6 +204,10 @@ class GameModeManager(object):
                      duration=None)]
             self.script_json = dict(steps=self.gamesteps)
 
+        # initialize and connect to Aurora
+        #aurora = aurora_init()
+        #aurora.connect()
+            
         # load/validate trigger options:
         self.trigger_mode = None
         self.trigger_key = None
@@ -328,6 +348,7 @@ class GameModeManager(object):
                     'mode'] + '" should be one of keyboard, serial or none')
                 return
 
+        self.output_trigger_lsl_outlet = None
         self.output_trigger_mode = None
         self.output_trigger_serial_port = None
         self.output_trigger_parallel_port_address = 0x0000
@@ -338,6 +359,7 @@ class GameModeManager(object):
 
         self.output_trigger_parallel_send_byte_by_trigger = {}
         self.output_trigger_serial_send_strings_by_trigger = {}
+        self.output_trigger_lsl_send_strings_by_trigger = {}
 
         if 'output_trigger_settings' in self.script_json:
             output_settings = self.script_json['output_trigger_settings']
@@ -388,7 +410,7 @@ class GameModeManager(object):
 
                 # load list of triggers
                 # if none supplied, error
-                if self.output_trigger_mode != None and 'parallel_trigger_hex_values_by_event' not in output_settings:
+                if self.output_trigger_mode != None and 'serial_trigger_strings_by_event' not in output_settings:
                     print('Invalid script JSON')
                     print('output_trigger_settings must have serial_trigger_strings_by_event dictionary of strings/strings')
                     print('please see the documentation for a sample file')
@@ -485,6 +507,45 @@ class GameModeManager(object):
                         print('"%s" is not a valid base-16 integer' % byte_val_string)
                         return
                     self.output_trigger_parallel_send_byte_by_trigger[option] = byte_val
+            elif output_settings['mode'] == 'pylsl':
+                self.output_trigger_mode = 'pylsl'
+
+                # optional JSON section so a script can override the defaults
+                lsl_opts   = output_settings.get('lsl_options', {})
+                stream_name  = lsl_opts.get('name', 'Trigger')
+                stream_type  = lsl_opts.get('type', 'Markers')
+                source_id    = lsl_opts.get('source_id', 'AsteroidImpact')
+
+                info    = StreamInfo(name=stream_name,
+                                     type=stream_type,
+                                     channel_count=1,
+                                     channel_format='int32',
+                                     source_id=source_id)
+                self.output_trigger_lsl_outlet = StreamOutlet(info)
+
+                # load list of triggers
+                # if none supplied, error
+                if self.output_trigger_mode != None and 'lsl_trigger_strings_by_event' not in output_settings:
+                    print('Invalid script JSON')
+                    print('output_trigger_settings must have lsl_trigger_strings_by_event dictionary of strings/strings')
+                    print('please see the documentation for a sample file')
+                    return
+
+                if not isinstance(output_settings['lsl_trigger_strings_by_event'], dict):
+                    print('Invalid script JSON')
+                    print('output_trigger_settings property lsl_trigger_strings_by_event must be dictionary of string keys and string values')
+                    print('please see the documentation for a sample file')
+                    return
+
+                # validate trigger list entries are all known triggers
+                for option, int_val in output_settings['lsl_trigger_strings_by_event'].items():
+                    if not option in ALL_TRIGGERS:
+                        print('Invalid script JSON')
+                        print('output_trigger_settings trigger_list option of "%s" is not a known outbound trigger' % option)
+                        return
+                    #string_val = str(string_val)
+                    self.output_trigger_lsl_send_strings_by_trigger[option] = int_val
+
             elif output_settings['mode'] == 'none':
                 pass
             else:
@@ -1334,6 +1395,8 @@ class GameModeManager(object):
 
                 # game quit is delayed to here so logging happens for final update
                 if quitgame:
+                    del self.output_trigger_lsl_outlet
+                    #aurora_cleanup(aurora)
                     return
 
             # draw topmost opaque screen and everything above it
@@ -1383,6 +1446,22 @@ class GameModeManager(object):
             for s in serial_trigger_output_strings:
                 self.output_trigger_serial_port.write(s)
             self.output_trigger_serial_port.flush()
+        elif self.output_trigger_mode == 'pylsl':
+            lsl_trigger_output_strings = []
+            for t in frametriggerlist:
+                if t in self.output_trigger_lsl_send_strings_by_trigger:
+                    lsl_trigger_output_strings.append(self.output_trigger_lsl_send_strings_by_trigger[t])
+                    send_trigger = True
+                    if print_triggers: print(t)
+
+            if not send_trigger:
+                return
+
+            # One trigger  ➜  push_sample;  many ➜ push_chunk
+            if len(lsl_trigger_output_strings) == 1:
+                self.output_trigger_lsl_outlet.push_sample(x=[lsl_trigger_output_strings[0]])
+            else:
+                self.output_trigger_lsl_outlet.push_chunk(x=lsl_trigger_output_strings)
         elif self.output_trigger_mode == 'parallel':
             parallel_trigger_bytes = []
             for t in frametriggerlist:
@@ -1428,6 +1507,27 @@ def main():
     game_step_manager = GameModeManager(args)
     game_step_manager.gameloop()
 
+def aurora_init():
+    # prep for initial connection to Aurora
+    try:
+        aurora_instance_info = Aurora.start_instance()
+    except:
+        aurora_info = Aurora.discover_instances()
+        if len(aurora_info) == 0:
+            raise SystemExit("No Aurora instance found")
+        aurora = aurora_info[0]
+        if aurora is None:
+            raise SystemExit("Could not find Aurora instance")
+        aurora_instance_info = aurora_info[0]
+
+    aurora = Aurora(aurora_instance_info, debug_requests=True)
+
+    return aurora
+
+def aurora_cleanup(aurora):
+    aurora.reset_settings()
+    aurora.alert_window()
+    aurora.disconnect()
 
 if __name__ == '__main__':
     main()
