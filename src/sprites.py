@@ -645,6 +645,14 @@ class ReactionTimePrompt(VirtualGameSprite):
                     # show
                     self.showtime_last = self.total_elapsed
                     self.activate_and_show()
+
+                    # Differentiate based on unique properties
+                    if self.image_name == "ufo_green.png":
+                        frame_outbound_triggers.append("dtrt_go_onset")
+                    elif self.image_name == "ufo_red.png":
+                        frame_outbound_triggers.append("dtrt_nogo_onset")
+                    else:
+                        frame_outbound_triggers.append("dtrt_unknown_onset")
             if (not self.visible
                     and self.step_trigger_count_last != step_trigger_count
                     and self.showtimes_trigger_counts
@@ -652,6 +660,14 @@ class ReactionTimePrompt(VirtualGameSprite):
                 # show
                 self.showtime_last = self.total_elapsed
                 self.activate_and_show()
+
+                # Differentiate based on unique properties
+                if self.image_name == "ufo_green.png":
+                    frame_outbound_triggers.append("dtrt_go_onset")
+                elif self.image_name == "ufo_red.png":
+                    frame_outbound_triggers.append("dtrt_nogo_onset")
+                else:
+                    frame_outbound_triggers.append("dtrt_unknown_onset")
         else:
             visible_ms = self.total_elapsed - self.showtime_last
             logrowdetails['reaction_prompt_state'] = 'waiting'
@@ -809,18 +825,48 @@ class ReactionTimePromptGroup(pygame.sprite.OrderedUpdates):
                 prompt_events,
                 step_trigger_count)
             if endingtype == 'pass' and prompt.score_pass != None:
+                if prompt.image_name == "ufo_green.png":
+                    frame_outbound_triggers.append('dtrt_go_hit')
+                elif prompt.image_name == "ufo_red.png":
+                    frame_outbound_triggers.append('dtrt_nogo_fa')
+                else:
+                    frame_outbound_triggers.append('dtrt_unknown_resp')
+
+                if prompt.image_name == "ufo_red.png":
+                    score_mul = 1
+                elif prompt.image_name == "ufo_green.png":
+                    rt = prompt.total_elapsed - prompt.showtime_last
+                    max_rt = prompt.timeout_millis
+                    score_mul = (max_rt - rt) / max_rt
+                else:
+                    score_mul = 1
+
                 score_changes.append(dict(
-                    change=prompt.score_pass,
+                    change=round(prompt.score_pass * score_mul),
                     centerx=prompt_gamerect_before.centerx,
                     centery=prompt_gamerect_before.centery))
 
             elif endingtype == 'fail' and prompt.score_fail != None:
+                if prompt.image_name == "ufo_green.png":
+                    frame_outbound_triggers.append('dtrt_go_hit')
+                elif prompt.image_name == "ufo_red.png":
+                    frame_outbound_triggers.append('dtrt_nogo_fa')
+                else:
+                    frame_outbound_triggers.append('dtrt_unknown_resp')
+
                 score_changes.append(dict(
                     change=prompt.score_fail,
                     centerx=prompt_gamerect_before.centerx,
                     centery=prompt_gamerect_before.centery))
 
-            elif endingtype == 'timeout' and prompt.score_fail != None:
+            elif endingtype == 'timeout' and prompt.score_miss != None:
+                if prompt.image_name == "ufo_green.png":
+                    frame_outbound_triggers.append('dtrt_go_miss')
+                elif prompt.image_name == "ufo_red.png":
+                    frame_outbound_triggers.append('dtrt_nogo_cr')
+                else:
+                    frame_outbound_triggers.append('dtrt_unknown_nonresp')
+
                 score_changes.append(dict(
                     change=prompt.score_miss,
                     centerx=prompt_gamerect_before.centerx,
@@ -882,6 +928,7 @@ class Overlay(VirtualGameSprite):
             w=virtualdisplay.screenplayarea.width,
             h=virtualdisplay.screenplayarea.height,
             visible=0,
+            image=None,
             **kwargs_extra):
         # if kwargs_extra: print 'extra arguments:', kwargs_extra
         VirtualGameSprite.__init__(self)  # call Sprite initializer
