@@ -1732,6 +1732,8 @@ class AsteroidImpactInfiniteGameplayScreen(GameScreen):
 
                         if self.game_globals['multicolor_high_score'] < self.score:
                             self.game_globals['multicolor_high_score'] = self.score
+                    else:
+                        scoreincrement = 0
 
                     target.pickedup(score=scoreincrement)
 
