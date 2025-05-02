@@ -1,0 +1,258 @@
+{
+  "output_trigger_settings": {
+    "mode": "pylsl",
+
+    "lsl_trigger_strings_by_event": {
+      "step_begin": 1,
+      "game_level_begin": 2,
+      "game_level_complete": 3,
+      "game_death": 4,
+      "game_shield_activate": 5,
+      "game_slow_activate": 6,
+      "game_crystal_collected": 7,
+      "adaptive_difficulty_increase": 8,
+      "adaptive_difficulty_decrease": 9,
+      "dtrt_go_onset": 10,
+      "dtrt_nogo_onset": 11,
+      "dtrt_go_hit": 12,
+      "dtrt_go_miss": 13,
+      "dtrt_nogo_fa": 14,
+      "dtrt_nogo_cr": 15
+    },
+    "lsl_options": {
+    }
+  },
+  "steps": [
+    {
+      "action": "game-adaptive",
+      "start_level": 3.5,
+      "level_completion_increment": 0.4,
+      "level_death_decrement": 0.3,
+      "continuous_asteroids_on_same_level": false,
+      "show_advance_countdown": false,
+
+      "multicolor_crystal_scoring": true,
+      "multicolor_crystal_numbers": [ 3 ],
+      "multicolor_crystal_num_showing": 1,
+      "multicolor_crystal_lifetime_ms": null,
+      "multicolor_crystal_negative_score_buzzer": false,
+
+      "multicolor_crystal_score_table": [
+        [ 0, 25, 25, 25, 25, 25 ],
+        [ 50, 0, 50, 50, 50, 50 ],
+        [ 10, 10, 10, 10, 10, 10 ],
+        [ 200, 200, 200, 0, 200, 200 ],
+        [ 500, 500, 500, 500, 0, 500 ]
+      ],
+
+      "level_templates": [
+        {
+          "asteroid_count": 1,
+          "asteroid_speeds": "slow",
+          "powerup_count": 0,
+          "target_count": 3
+        },
+        {
+          "asteroid_count": 1,
+          "asteroid_speeds": "medium",
+          "powerup_count": 0,
+          "target_count": 4
+        },
+        {
+          "asteroid_count": 3,
+          "asteroid_sizes": "varied",
+          "asteroid_speeds": "medium",
+          "powerup_count": 0,
+          "powerup_delay": 0.5,
+          "powerup_types": [
+            "slow"
+          ],
+          "target_count": 5
+        },
+        {
+          "asteroid_count": 3,
+          "asteroid_sizes": "varied",
+          "asteroid_speeds": "slow",
+          "powerup_count": 0,
+          "powerup_delay": 0.5,
+          "powerup_types": [
+            "slow"
+          ],
+          "target_count": 6
+        },
+        {
+          "asteroid_count": 2,
+          "asteroid_speeds": "medium",
+          "powerup_count": 0,
+          "powerup_delay": 0.5,
+          "powerup_types": [
+            "shield"
+          ],
+          "target_count": 7
+        },
+        {
+          "asteroid_count": 3,
+          "asteroid_speeds": "medium",
+          "powerup_count": 0,
+          "powerup_delay": 0.5,
+          "powerup_types": [
+            "shield"
+          ],
+          "target_count": 8
+        },
+        {
+          "asteroid_count": 3,
+          "asteroid_speeds": "medium",
+          "powerup_count": 0,
+          "powerup_delay": 0.5,
+          "powerup_types": [
+            "slow"
+          ],
+          "target_count": 8
+        },
+        {
+          "asteroid_count": 2,
+          "asteroid_speeds": "fast",
+          "powerup_count": 0,
+          "powerup_delay": 0.5,
+          "powerup_types": [
+            "slow"
+          ],
+          "target_count": 8
+        },
+        {
+          "asteroid_count": 4,
+          "asteroid_sizes": "medium",
+          "asteroid_speeds": "medium",
+          "powerup_count": 0,
+          "powerup_delay": 2.0,
+          "powerup_types": [
+            "slow",
+            "shield"
+          ],
+          "target_count": 8
+        },
+        {
+          "asteroid_count": 4,
+          "asteroid_sizes": "medium",
+          "asteroid_speeds": "fast",
+          "powerup_count": 0,
+          "powerup_delay": 2.0,
+          "powerup_types": [
+            "slow",
+            "shield"
+          ],
+          "target_count": 8
+        },
+        {
+          "asteroid_count": 6,
+          "asteroid_sizes": "small",
+          "asteroid_speeds": "medium",
+          "powerup_count": 1,
+          "powerup_delay": 2.0,
+          "powerup_types": [
+            "shield"
+          ],
+          "target_count": 16
+        },
+        {
+          "asteroid_count": 8,
+          "asteroid_sizes": "varied",
+          "asteroid_speeds": "medium",
+          "powerup_count": 1,
+          "powerup_delay": 2.0,
+          "powerup_types": [
+            "shield"
+          ],
+          "target_count": 16
+        },
+        {
+          "asteroid_count": 5,
+          "asteroid_speeds": "extreme",
+          "powerup_count": 1,
+          "powerup_delay": 0.5,
+          "powerup_types": [
+            "shield"
+          ],
+          "target_count": 16
+        }
+      ],
+      "reaction_prompts": [
+        {
+          "diameter": 100,
+          "position_list": [
+            [ 160, 120 ],
+            [ 160, 120 ],
+            [ 160, 360 ],
+            [ 480, 360 ],
+            [ 160, 120 ],
+            [ 480, 120 ],
+            [ 480, 360 ],
+            [ 480, 120 ],
+            [ 160, 360 ],
+            [ 160, 120 ],
+            [ 160, 360 ],
+            [ 160, 360 ],
+            [ 480, 360 ],
+            [ 480, 120 ],
+            [ 160, 360 ],
+            [ 160, 120 ],
+            [ 480, 120 ],
+            [ 480, 120 ],
+            [ 480, 360 ],
+            [ 480, 360 ]
+          ],
+          "image": "ufo_green.png",
+          "sound": "none",
+          "showtimes_millis": [ 4964, 7711, 16253, 18480, 25184, 28023, 36703, 40952, 50103, 61551, 66728, 69053, 71547, 87495, 91883, 95979, 107266, 109884, 129441, 131845, 144389, 152831, 158890, 167231, 173562, 177669, 181364, 189192, 196018, 201776, 205043, 211416, 214784, 218678, 225527, 234530, 240834, 243949, 248271, 252533, 267033,270265, 275874, 278936, 297467, 302126, 316174, 319865, 327844, 333526, 337820, 340886, 349692, 353085, 357320, 365353, 368418, 370878, 381214, 384896, 392181, 397566, 403426, 407431, 419626, 422671, 425883, 442846, 452418, 459223, 464586, 467641, 476209, 486548, 496785, 502960, 514797, 519926, 525691, 536237, 542160, 547327, 559957, 564998, 571790, 580504, 585209, 590755, 606902, 609733, 616424, 624029, 631683, 634818, 637755, 643581, 646727, 650075, 652950, 657921, 660570, 665457, 669885, 673224, 677457, 680380, 687869, 692207, 697903, 700836, 712144, 718491, 721257, 729583, 732712, 741456, 744938, 751665, 758406, 762964,780578, 790189, 815994, 825604, 832234, 835164, 838890, 847699, 851495, 856922, 860003, 875328, 878091, 882790, 885554, 893507, 896938, 905296, 911340, 919686, 927861, 932492, 935859, 939485, 941661, 947929, 956779, 960210, 964439, 970428, 978244, 988404, 991952, 994856, 998737, 1000902, 1006955, 1010551, 1013861,1037667, 1050242, 1053062, 1057199, 1061608, 1064654, 1074478, 1080964, 1096234, 1099048, 1104691, 1130632, 1136276, 1143229, 1147158, 1154204, 1160060, 1167835, 1173492, 1177993, 1180718, 1186205, 1189643, 1194113, 1197492, 1201698, 1209077, 1212586, 1222798, 1225749, 1229621, 1232058, 1241734, 1246127, 1258041, 1262792, 1265577, 1271826, 1275671, 1279550, 1283921, 1298817, 1308243, 1310709, 1314342, 1320248, 1325449, 1332485, 1344489, 1352500, 1360077, 1362827, 1367157, 1370470, 1378989, 1390688, 1392956, 1397170, 1404944, 1408132, 1420932, 1430748, 1444978, 1453331, 1456745, 1459793, 1463230, 1465500, 1468592, 1470815, 1488804, 1492162, 1507556, 1511925, 1515745, 1528759, 1531451, 1534193, 1540093, 1543706, 1548554, 1552388, 1555663, 1562443, 1571481, 1576808, 1592525, 1597811, 1603575, 1606901, 1611913, 1616581, 1626784, 1629615, 1639424, 1643224, 1645423, 1655569, 1658206, 1662431, 1670669, 1683886, 1685965, 1690326, 1693277, 1702024, 1705657, 1712921, 1726366, 1733400, 1736800, 1743130, 1752225, 1763974, 1768680, 1777693, 1781015, 1786161 ],
+          "showtimes_trigger_counts": [],
+          "input_key": "K_SPACE",
+          "timeout_millis": 1500,
+          "stay_visible": false,
+          "fail_on_wrong_key": true,
+          "pass_fail_sounds": false,
+          "score_pass": 100,
+          "score_fail": null,
+          "score_miss": -90
+        },
+        {
+          "diameter": 100,
+          "position_list": [
+            [ 160, 360 ],
+            [ 480, 360 ],
+            [ 480, 360 ],
+            [ 160, 120 ],
+            [ 480, 360 ],
+            [ 480, 360 ],
+            [ 480, 120 ],
+            [ 160, 360 ],
+            [ 480, 120 ],
+            [ 160, 360 ],
+            [ 480, 120 ],
+            [ 160, 120 ],
+            [ 480, 120 ],
+            [ 160, 360 ],
+            [ 480, 360 ],
+            [ 480, 120 ],
+            [ 160, 360 ],
+            [ 160, 120 ],
+            [ 160, 120 ],
+            [ 160, 120 ]
+          ],
+          "image": "ufo_red.png",
+          "sound": "none",
+          "showtimes_millis": [ 13907, 21074, 31448, 77833, 112356, 117724, 136827, 150241, 161294, 198303, 223064, 237936, 260638, 284245, 292222, 309895, 312043, 360620, 375716, 388532, 401114, 433607, 454573, 479490, 505863, 593414, 596556, 599736, 602272, 655952, 708671, 737820, 766868, 773258, 776562, 783280, 794067, 801628, 805910, 807866, 820323, 866385, 890068, 914884, 923109, 930404, 954288, 968235, 1017111, 1021417, 1032858, 1042685, 1046297, 1086737, 1109039, 1125245, 1139144, 1163333, 1235099, 1250385, 1269024, 1289118, 1292722, 1302859, 1338022, 1341823, 1348173, 1387534, 1411753, 1417795, 1428168, 1436169, 1479521, 1482908, 1500247, 1504997, 1523670, 1567730, 1584582, 1588058, 1631962, 1648350, 1653481, 1667033, 1677915, 1697336, 1722043, 1729680, 1739608, 1772847, 1792021, 1794481 ],
+          "showtimes_trigger_counts": [],
+          "input_key": "K_SPACE",
+          "timeout_millis": 1500,
+          "stay_visible": false,
+          "fail_on_wrong_key": true,
+          "pass_fail_sounds": false,
+          "score_pass": -200,
+          "score_fail": -200,
+          "score_miss": 10
+        }
+      ]
+    }
+  ]
+}
