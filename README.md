@@ -13,7 +13,7 @@ To install and run:
 4) cd into the downloaded (unzipped) directory
 5) do 'uv venv .venv'
 6) do 'uv pip sync'
-7) run the game using 'uv run game.py --display-mode fullscreen --script-json script.json'
+7) run the game using 'uv run game.py --display-mode fullscreen --script-json script.json' (or, to enable logging: 'uv run game.py --display-mode fullscreen --script-json script.json --subject-number 1 --log-filename logs\test_log.csv --reaction-log-filename logs\reaction_test_log.csv --log-overwrite false')
 
 # License
 
