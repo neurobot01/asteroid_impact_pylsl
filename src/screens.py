@@ -103,7 +103,7 @@ def flow_text(text, bounds_rect, font, color, line_height, valign='middle'):
 
     wrapped_lines = []
     for line in lines:
-        line = line.strip()
+        #line = line.strip()
         wrappedline = True
         while wrappedline:
             wrappedline = False
@@ -649,7 +649,7 @@ class AsteroidImpactInstructionsScreenAlt(GameScreen):
                 "Move your ship around with your mouse, picking up crystals",
                 black, left=240, top=120))
 
-        s = Target()
+        s = ScoredTarget(imagefile='Crystal_3.png')
         s.gamerect.topleft = (120, 200)
         s.update_rect()
         self.sprites.add(s)
@@ -705,22 +705,22 @@ class AsteroidImpactInstructionsScreenAlt(GameScreen):
             "Pick up a clock to slow asteroids for a few seconds",
             black, left=240, top=580))
 
-        s = ReactionTimePrompt(image="triangle.png")
+        s = ReactionTimePrompt(image="ufo_green.png")
         s.gamerect.topleft = (105, 640)
         s.update_rect()
         self.sprites.add(s)
         self.textsprites.append(TextSprite(
             self.font,
-            "Press z when you see a triangle",
+            "Press the space bar when you see a UFO with a green alien",
             black, left=240, top=660))
 
-        s = ReactionTimePrompt(image="square.png")
+        s = ReactionTimePrompt(image="ufo_red.png")
         s.gamerect.topleft = (105, 720)
         s.update_rect()
         self.sprites.add(s)
         self.textsprites.append(TextSprite(
             self.font,
-            "Press x when you see a square",
+            "DO NOT press any key when you see a UFO with a red alien",
             black, left=240, top=740))
 
         if self.click_to_continue:
@@ -1353,7 +1353,7 @@ class AsteroidImpactInfiniteGameplayScreen(GameScreen):
 
         # init high score if there is none
         if 'multicolor_high_score' not in self.game_globals:
-            game_globals['multicolor_high_score'] = 0
+            game_globals['multicolor_high_score'] = 610
 
         if game_element_opacity > 255:
             game_element_opacity = 255
